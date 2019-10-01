@@ -13,7 +13,7 @@ from pygelf import gelf
 
 class BaseHandler(object):
     def __init__(self, debug=False, version='1.1', include_extra_fields=False, compress=False,
-                 static_fields=None, json_default=gelf.object_to_json, **kwargs):
+                 static_fields=None, json_default=gelf.object_to_json, domain=None, **kwargs):
         """
         Logging handler that transforms each record into GELF (graylog extended log format) and sends it over TCP.
 
@@ -24,12 +24,15 @@ class BaseHandler(object):
                        Each additional field should start with underscore, e.g. _app_name
         """
 
+        if domain is None:
+          domain = socket.gethostname()
+
         self.debug = debug
         self.version = version
         self.additional_fields = static_fields if static_fields else kwargs
         self.include_extra_fields = include_extra_fields
         self.additional_fields.pop('_id', None)
-        self.domain = socket.gethostname()
+        self.domain = domain
         self.compress = compress
         self.json_default = json_default
 
